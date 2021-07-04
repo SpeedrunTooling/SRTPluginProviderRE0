@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SRTPluginProviderRE0.Structs.GameStructs;
+using System;
 
 namespace SRTPluginProviderRE0
 {
@@ -10,19 +11,15 @@ namespace SRTPluginProviderRE0
 
         int PlayerCurrentHealth { get; set; }
         int PlayerMaxHealth { get; set; }
+        int PlayerCurrentHealth2 { get; set; }
+        int PlayerMaxHealth2 { get; set; }
 
-        short Kills { get; set; }
+        GameStats Stats { get; set; }
 
-        short Shots { get; set; }
-
-        short Recoveries { get; set; }
-
-        int Saves { get; set; }
-
-        float IGT { get; set; }
+        GameInventoryEntry PlayerInventory { get; set; }
+        GameInventoryEntry PlayerInventory2 { get; set; }
 
         TimeSpan IGTTimeSpan { get; }
-
         string IGTFormattedString { get; }
 
     }

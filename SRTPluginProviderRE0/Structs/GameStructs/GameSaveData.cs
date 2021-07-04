@@ -2,23 +2,20 @@
 
 namespace SRTPluginProviderRE0.Structs.GameStructs
 {
-    [StructLayout(LayoutKind.Explicit, Pack = 1)]
+    [StructLayout(LayoutKind.Explicit, Pack = 1, Size = 80)]
 
-    public unsafe struct GameSaveData
+    public struct GameStats
     {
-        [FieldOffset(0x8)] public int Money;
-        [FieldOffset(0x14)] public short LeonCurrentHP;
-        [FieldOffset(0x16)] public short LeonMaxHP;
-        [FieldOffset(0x18)] public short AshleyCurrentHP;
-        [FieldOffset(0x1A)] public short AshleyMaxHP;
-        [FieldOffset(0x36C)] public short IGTFrames;
+        [FieldOffset(0x38)] private int saves;
+        [FieldOffset(0x3C)] private float igt;
+        [FieldOffset(0x4A)] private short kills;
+        [FieldOffset(0x4C)] private short shots;
+        [FieldOffset(0x4E)] private short recoveries;
+        public int Saves => saves;
+        public float IGT => igt;
+        public short Kills => kills;
+        public short Shots => shots;
+        public short Recoveries => recoveries;
 
-        public static GameSaveData AsStruct(byte[] data)
-        {
-            fixed (byte* pb = &data[0])
-            {
-                return *(GameSaveData*)pb;
-            }
-        }
     }
 }

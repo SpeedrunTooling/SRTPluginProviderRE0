@@ -1,4 +1,5 @@
 ﻿using ProcessMemory;
+using SRTPluginProviderRE0.Structs.GameStructs;
 using System;
 using System.Diagnostics;
 
@@ -24,6 +25,7 @@ namespace SRTPluginProviderRE0
 
         private MultilevelPointer[] PointerHP { get; set; }
         private MultilevelPointer PointerStats { get; set; }
+        private MultilevelPointer PointerInventory { get; set; }
 
         internal GameMemoryRE0Scanner(Process process = null)
         {
@@ -53,8 +55,10 @@ namespace SRTPluginProviderRE0
                     position = (i * 0xC) + 0x4;
                     PointerHP[i] = new MultilevelPointer(memoryAccess, IntPtr.Add(BaseAddress, pointerAddressHP), 0x6CC, position);
                 }
-                
+
                 PointerStats = new MultilevelPointer(memoryAccess, IntPtr.Add(BaseAddress, pointerAddressStats));
+
+                PointerInventory = new MultilevelPointer(memoryAccess, IntPtr.Add(BaseAddress, pointerAddressInventory));
             }
         }
 
@@ -72,37 +76,27 @@ namespace SRTPluginProviderRE0
                 PointerHP[i].UpdatePointers();
             }
             PointerStats.UpdatePointers();
+            PointerInventory.UpdatePointers();
         }
 
         internal unsafe IGameMemoryRE0 Refresh()
         {
-            bool success;
-
-            // Leon
-            fixed (int* p = &gameMemoryValues._playerCurrentHealth)
-                success = PointerHP[0].TryDerefInt(0x1030, p);
-            
+            // Rebecca
+            gameMemoryValues._playerCurrentHealth = PointerHP[0].DerefInt(0x1030);
             gameMemoryValues._playerMaxHealth = 150;
 
-            fixed (int* p = &gameMemoryValues._playerCurrentHealth2)
-                success = PointerHP[1].TryDerefInt(0x1030, p);
-
+            // Billy and Wesker
+            gameMemoryValues._playerCurrentHealth2 = PointerHP[1].DerefInt(0x1030);
             gameMemoryValues._playerMaxHealth2 = 150;
 
-            fixed (int* p = &gameMemoryValues._saves)
-                success = PointerStats.TryDerefInt(0x38, p);
+            // Game Statistics
+            gameMemoryValues._stats = PointerStats.Deref<GameStats>(0x0);
 
-            fixed (float* p = &gameMemoryValues._igt)
-                success = PointerStats.TryDerefFloat(0x3C, p);
+            //Inventory 1
+            gameMemoryValues._playerInventory = PointerInventory.Deref<GameInventoryEntry>(0x24);
 
-            fixed (short* p = &gameMemoryValues._kills)
-                success = PointerStats.TryDerefShort(0x4A, p);
-
-            fixed (short* p = &gameMemoryValues._shots)
-                success = PointerStats.TryDerefShort(0x4C, p);
-
-            fixed (short* p = &gameMemoryValues._recoveries)
-                success = PointerStats.TryDerefShort(0x4E, p);
+            //Inventory 1
+            gameMemoryValues._playerInventory2 = PointerInventory.Deref<GameInventoryEntry>(0x64);
 
             HasScanned = true;
             return gameMemoryValues;

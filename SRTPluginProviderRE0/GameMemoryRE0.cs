@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SRTPluginProviderRE0.Structs.GameStructs;
+using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
@@ -7,7 +8,7 @@ namespace SRTPluginProviderRE0
 {
     public class GameMemoryRE0 : IGameMemoryRE0
     {
-        private const string IGT_TIMESPAN_STRING_FORMAT = @"hh\:mm\:ss\.fff";
+        private const string IGT_TIMESPAN_STRING_FORMAT = @"hh\:mm\:ss";
         public string GameName => "RE0";
 
         // Versioninfo
@@ -26,20 +27,14 @@ namespace SRTPluginProviderRE0
         public int PlayerMaxHealth2 { get => _playerMaxHealth2; set => _playerMaxHealth2 = value; }
         internal int _playerMaxHealth2;
 
-        public short Kills { get => _kills; set => _kills = value; }
-        internal short _kills;
+        public GameStats Stats { get => _stats; set => _stats = value; }
+        internal GameStats _stats;
 
-        public short Shots { get => _shots; set => _shots = value; }
-        internal short _shots;
+        public GameInventoryEntry PlayerInventory { get => _playerInventory; set => _playerInventory = value; }
+        internal GameInventoryEntry _playerInventory;
 
-        public short Recoveries { get => _recoveries; set => _recoveries = value; }
-        internal short _recoveries;
-
-        public int Saves { get => _saves; set => _saves = value; }
-        internal int _saves;
-
-        public float IGT { get => _igt; set => _igt = value; }
-        internal float _igt;
+        public GameInventoryEntry PlayerInventory2 { get => _playerInventory2; set => _playerInventory2 = value; }
+        internal GameInventoryEntry _playerInventory2;
 
         public TimeSpan IGTTimeSpan
         {
@@ -47,8 +42,8 @@ namespace SRTPluginProviderRE0
             {
                 TimeSpan timespanIGT;
 
-                if (IGT >= 0f)
-                    timespanIGT = TimeSpan.FromSeconds(IGT);
+                if (Stats.IGT >= 0f)
+                    timespanIGT = TimeSpan.FromSeconds(Stats.IGT / 30);
                 else
                     timespanIGT = new TimeSpan();
 
