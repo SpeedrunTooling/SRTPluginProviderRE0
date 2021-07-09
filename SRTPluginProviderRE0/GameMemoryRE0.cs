@@ -15,26 +15,39 @@ namespace SRTPluginProviderRE0
         public string VersionInfo => FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
 
         // Leon Stats
-        public int PlayerCurrentHealth { get => _playerCurrentHealth; set => _playerCurrentHealth = value; }
-        internal int _playerCurrentHealth;
+        public GamePlayer Player { get => _player; set => _player = value; }
+        internal GamePlayer _player;
 
-        public int PlayerMaxHealth { get => _playerMaxHealth; set => _playerMaxHealth = value; }
-        internal int _playerMaxHealth;
+        public string PlayerName => string.Format("{0}: ", Player.PlayerCharacter.ToString());
 
-        public int PlayerCurrentHealth2 { get => _playerCurrentHealth2; set => _playerCurrentHealth2 = value; }
-        internal int _playerCurrentHealth2;
+        public GamePlayer Player2 { get => _player2; set => _player2 = value; }
+        internal GamePlayer _player2;
 
-        public int PlayerMaxHealth2 { get => _playerMaxHealth2; set => _playerMaxHealth2 = value; }
-        internal int _playerMaxHealth2;
+        public string PlayerName2 => string.Format("{0}: ", Player2.PlayerCharacter.ToString());
 
         public GameStats Stats { get => _stats; set => _stats = value; }
         internal GameStats _stats;
 
-        public GameInventoryEntry PlayerInventory { get => _playerInventory; set => _playerInventory = value; }
-        internal GameInventoryEntry _playerInventory;
+        public GameInventoryEntry[] PlayerInventory { get => _playerInventory; set => _playerInventory = value; }
+        internal GameInventoryEntry[] _playerInventory;
 
-        public GameInventoryEntry PlayerInventory2 { get => _playerInventory2; set => _playerInventory2 = value; }
-        internal GameInventoryEntry _playerInventory2;
+        public int EquippedSlot { get => _equippedSlot; set => _equippedSlot = value; }
+        public int _equippedSlot;
+
+        public GameInventoryEntry CurrentPersonal { get => _currentPersonal; set => _currentPersonal = value; }
+        internal GameInventoryEntry _currentPersonal;
+        public GameInventoryEntry CurrentWeapon => PlayerInventory[EquippedSlot];
+
+        public GameInventoryEntry[] PlayerInventory2 { get => _playerInventory2; set => _playerInventory2 = value; }
+        internal GameInventoryEntry[] _playerInventory2;
+
+        public int EquippedSlot2 { get => _equippedSlot2; set => _equippedSlot2 = value; }
+        public int _equippedSlot2;
+
+        public GameInventoryEntry CurrentPersonal2 { get => _currentPersonal2; set => _currentPersonal2 = value; }
+        internal GameInventoryEntry _currentPersonal2;
+
+        public GameInventoryEntry CurrentWeapon2 => PlayerInventory2[EquippedSlot2];
 
         public TimeSpan IGTTimeSpan
         {

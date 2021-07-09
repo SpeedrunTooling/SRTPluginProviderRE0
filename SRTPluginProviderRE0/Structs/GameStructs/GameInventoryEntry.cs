@@ -7,92 +7,25 @@ using System.Threading.Tasks;
 
 namespace SRTPluginProviderRE0.Structs.GameStructs
 {
-    [StructLayout(LayoutKind.Explicit, Pack = 1, Size = 48)]
+    [StructLayout(LayoutKind.Explicit, Pack = 1, Size = 8)]
     public unsafe struct GameInventoryEntry
     {
-        [FieldOffset(0x0)] private int slot1ID;
-        [FieldOffset(0x4)] private int slot1Quantity;
-        [FieldOffset(0x8)] private int slot2ID;
-        [FieldOffset(0xC)] private int slot2Quantity;
-        [FieldOffset(0x10)] private int slot3ID;
-        [FieldOffset(0x14)] private int slot3Quantity;
-        [FieldOffset(0x18)] private int slot4ID;
-        [FieldOffset(0x1C)] private int slot4Quantity;
-        [FieldOffset(0x20)] private int slot5ID;
-        [FieldOffset(0x24)] private int slot5Quantity;
-        [FieldOffset(0x28)] private int slot6ID;
-        [FieldOffset(0x2C)] private int slot6Quantity;
-        [FieldOffset(0x38)] private int equippedSlot;
-        public int Slot1ID => slot1ID;
-        public string Slot1Name => ItemDatabase.Items.ContainsKey(Slot1ID) ? ItemDatabase.Items[Slot1ID] : "Unknown Item";
-        public int Slot1Quantity => slot1Quantity;
-        public int Slot2ID => slot2ID;
-        public string Slot2Name => ItemDatabase.Items.ContainsKey(Slot1ID) ? ItemDatabase.Items[Slot2ID] : "Unknown Item";
-        public int Slot2Quantity => slot2Quantity;
-        public int Slot3ID => slot3ID;
-        public string Slot3Name => ItemDatabase.Items.ContainsKey(Slot1ID) ? ItemDatabase.Items[Slot3ID] : "Unknown Item";
-        public int Slot3Quantity => slot3Quantity;
-        public int Slot4ID => slot4ID;
-        public string Slot4Name => ItemDatabase.Items.ContainsKey(Slot1ID) ? ItemDatabase.Items[Slot4ID] : "Unknown Item";
-        public int Slot4Quantity => slot4Quantity;
-        public int Slot5ID => slot5ID;
-        public string Slot5Name => ItemDatabase.Items.ContainsKey(Slot1ID) ? ItemDatabase.Items[Slot5ID] : "Unknown Item";
-        public int Slot5Quantity => slot5Quantity;
-        public int Slot6ID => slot6ID;
-        public string Slot6Name => ItemDatabase.Items.ContainsKey(Slot1ID) ? ItemDatabase.Items[Slot6ID] : "Unknown Item";
-        public int Slot6Quantity => slot6Quantity;
-
-        public int EquippedSlot => equippedSlot;
-
-        public int EquippedSlotID 
-        { 
-            get
-            { 
-                switch (EquippedSlot)
-                {
-                    case 1:
-                        return Slot2ID;
-                    case 2:
-                        return Slot3ID;
-                    case 3:
-                        return Slot4ID;
-                    case 4:
-                        return Slot5ID;
-                    case 5:
-                        return Slot6ID;
-                    default:
-                        return Slot1ID;
-                }
-            } 
-        }
-
-        public int EquippedSlotAmmo
-        {
-            get
-            {
-                switch (EquippedSlot)
-                {
-                    case 1:
-                        return Slot2Quantity;
-                    case 2:
-                        return Slot3Quantity;
-                    case 3:
-                        return Slot4Quantity;
-                    case 4:
-                        return Slot5Quantity;
-                    case 5:
-                        return Slot6Quantity;
-                    default:
-                        return Slot1Quantity;
-                }
-            }
-        }
+        [FieldOffset(0x0)] private int id;
+        [FieldOffset(0x4)] private int quantity;
+        public int ID => id;
+        public string Name => ItemDatabase.ItemNames[ID];
+        public int Quantity => quantity;
+        public bool Is2Slots => ItemDatabase.Is2Slots.Contains(ID);
+        public bool HasQuantity => ItemDatabase.HasQuantity.Contains(ID);
     }
 
     public class ItemDatabase
     {
-        
-        public static Dictionary<int, string> Items = new Dictionary<int, string>()
+        public static List<int> HasQuantity = new List<int>() { 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 17, 19, 22, 23, 32, 33, 34, 35, 36, 37, 38, 39, 40, 55 };
+
+        public static List<int> Is2Slots = new List<int>() { 5, 6, 7, 8, 9, 11, 23, 104, };
+
+        public static Dictionary<int, string> ItemNames = new Dictionary<int, string>()
         {
             { 0, "Empty Slot" },
             { 2, "Knife" },
@@ -225,7 +158,7 @@ namespace SRTPluginProviderRE0.Structs.GameStructs
             { 152, "Court Order for Transportation" },
             { 153, "Investigation Orders" },
             { 154, "Notice to Supervisors" },
-            { 180, "Suitcase" }
+            { 180, "2nd Slot of Previous Item" }
         };
     }
 }

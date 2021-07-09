@@ -27,6 +27,8 @@ namespace SRTPluginProviderRE0
         private MultilevelPointer PointerStats { get; set; }
         private MultilevelPointer PointerInventory { get; set; }
 
+        private GamePlayer EmptyPlayer = new GamePlayer();
+
         internal GameMemoryRE0Scanner(Process process = null)
         {
             gameMemoryValues = new GameMemoryRE0();
@@ -52,13 +54,16 @@ namespace SRTPluginProviderRE0
 
                 for (var i = 0; i < PointerHP.Length; i++)
                 {
-                    position = (i * 0xC) + 0x4;
-                    PointerHP[i] = new MultilevelPointer(memoryAccess, IntPtr.Add(BaseAddress, pointerAddressHP), 0x6CC, position);
+                    position = (i * 0x4) + 0x11C;
+                    PointerHP[i] = new MultilevelPointer(memoryAccess, IntPtr.Add(BaseAddress, pointerAddressHP), position, 0x30);
                 }
 
                 PointerStats = new MultilevelPointer(memoryAccess, IntPtr.Add(BaseAddress, pointerAddressStats));
 
                 PointerInventory = new MultilevelPointer(memoryAccess, IntPtr.Add(BaseAddress, pointerAddressInventory));
+
+                gameMemoryValues._playerInventory = new GameInventoryEntry[6];
+                gameMemoryValues._playerInventory2 = new GameInventoryEntry[6];
             }
         }
 
@@ -82,21 +87,32 @@ namespace SRTPluginProviderRE0
         internal unsafe IGameMemoryRE0 Refresh()
         {
             // Rebecca
-            gameMemoryValues._playerCurrentHealth = PointerHP[0].DerefInt(0x1030);
-            gameMemoryValues._playerMaxHealth = 150;
+            gameMemoryValues._player = PointerHP[0].Deref<GamePlayer>(0x0);
 
             // Billy and Wesker
-            gameMemoryValues._playerCurrentHealth2 = PointerHP[1].DerefInt(0x1030);
-            gameMemoryValues._playerMaxHealth2 = 150;
+            if (PointerHP[0].Address != PointerHP[1].Address)
+                gameMemoryValues._player2 = PointerHP[1].Deref<GamePlayer>(0x0);
+            else
+                gameMemoryValues._player2 = EmptyPlayer;
 
             // Game Statistics
             gameMemoryValues._stats = PointerStats.Deref<GameStats>(0x0);
 
             //Inventory 1
-            gameMemoryValues._playerInventory = PointerInventory.Deref<GameInventoryEntry>(0x24);
+            for (var i = 0; i < gameMemoryValues.PlayerInventory.Length; i++)
+                gameMemoryValues._playerInventory[i] = PointerInventory.Deref<GameInventoryEntry>((i * 0x8) + 0x24);
 
-            //Inventory 1
-            gameMemoryValues._playerInventory2 = PointerInventory.Deref<GameInventoryEntry>(0x64);
+            gameMemoryValues._currentPersonal = PointerInventory.Deref<GameInventoryEntry>(0x54);
+
+            gameMemoryValues._equippedSlot = PointerInventory.DerefInt(0x5C);
+
+            //Inventory 2
+            for (var i = 0; i < gameMemoryValues.PlayerInventory2.Length; i++)
+                gameMemoryValues._playerInventory2[i] = PointerInventory.Deref<GameInventoryEntry>((i * 0x8) + 0x64);
+
+            gameMemoryValues._currentPersonal2 = PointerInventory.Deref<GameInventoryEntry>(0x94);
+
+            gameMemoryValues._equippedSlot2 = PointerInventory.DerefInt(0x9C);
 
             HasScanned = true;
             return gameMemoryValues;
