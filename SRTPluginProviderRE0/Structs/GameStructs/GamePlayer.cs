@@ -11,9 +11,8 @@ namespace SRTPluginProviderRE0.Structs.GameStructs
 
         public CharacterEnumeration PlayerCharacter => (CharacterEnumeration)id;
         public int CurrentHP => currentHP;
-        public int MaxHP => 
-            PlayerCharacter == CharacterEnumeration.Rebecca ? 150 : 250;
-        public float Percentage => CurrentHP > 0 ? (float)CurrentHP / (float)MaxHP: 0f;
+        public int MaxHP => PlayerCharacter == CharacterEnumeration.Rebecca ? 150 : 250;
+        public float Percentage => CurrentHP > 0 ? (float)CurrentHP / (float)MaxHP : 0f;
         public bool IsAlive => CurrentHP != 0 && MaxHP != 0 && CurrentHP > 0 && CurrentHP <= MaxHP;
         public PlayerState HealthState
         {
@@ -24,6 +23,8 @@ namespace SRTPluginProviderRE0.Structs.GameStructs
                 Percentage >= 0.25f ? PlayerState.Caution :
                 PlayerState.Danger;
         }
+
+        public string CurrentHealthState => HealthState.ToString();
     }
 
     public enum PlayerState

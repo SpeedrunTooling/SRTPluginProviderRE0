@@ -49,6 +49,9 @@ namespace SRTPluginProviderRE0
 
         public GameInventoryEntry CurrentWeapon2 => PlayerInventory2[EquippedSlot2];
 
+        public GameEnemy[] EnemyHealth { get => _enemyHealth; set => _enemyHealth = value; }
+        internal GameEnemy[] _enemyHealth;
+
         public TimeSpan IGTTimeSpan
         {
             get

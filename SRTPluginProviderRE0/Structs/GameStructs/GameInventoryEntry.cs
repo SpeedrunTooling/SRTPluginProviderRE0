@@ -17,11 +17,20 @@ namespace SRTPluginProviderRE0.Structs.GameStructs
         public int Quantity => quantity;
         public bool Is2Slots => ItemDatabase.Is2Slots.Contains(ID);
         public bool HasQuantity => ItemDatabase.HasQuantity.Contains(ID);
+        public bool IsWeapon => ItemDatabase.Weapons.Contains(ID);
+        public bool IsItem => ItemDatabase.Items.Contains(ID);
+        public bool IsThrowable => ItemDatabase.Throwable.Contains(ID);
     }
 
     public class ItemDatabase
     {
         public static List<int> HasQuantity = new List<int>() { 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 17, 19, 22, 23, 32, 33, 34, 35, 36, 37, 38, 39, 40, 55 };
+
+        public static List<int> Weapons = new List<int>() { 3, 4, 5, 6, 7, 8, 9, 10, 11, 17, 19, 22, 23 };
+
+        public static List<int> Items = new List<int>() { 32, 33, 34, 35, 36, 37, 40, 55 };
+
+        public static List<int> Throwable = new List<int>() { 14, 38, 39 };
 
         public static List<int> Is2Slots = new List<int>() { 5, 6, 7, 8, 9, 11, 23, 104, };
 

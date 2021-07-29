@@ -16,6 +16,7 @@ namespace SRTPluginProviderRE0
 
         GameInventoryEntry[] PlayerInventory { get; set; }
         GameInventoryEntry[] PlayerInventory2 { get; set; }
+        GameEnemy[] EnemyHealth { get; set; }
 
         TimeSpan IGTTimeSpan { get; }
         string IGTFormattedString { get; }
