@@ -2,6 +2,7 @@
 using SRTPluginProviderRE0.Structs.GameStructs;
 using System;
 using System.Diagnostics;
+using Windows.Win32;
 
 namespace SRTPluginProviderRE0
 {
@@ -14,17 +15,17 @@ namespace SRTPluginProviderRE0
         private ProcessMemoryHandler memoryAccess;
         private GameMemoryRE0 gameMemoryValues;
         public bool HasScanned;
-        public bool ProcessRunning => memoryAccess != null && memoryAccess.ProcessRunning;
-        public int ProcessExitCode => (memoryAccess != null) ? memoryAccess.ProcessExitCode : 0;
+        public bool ProcessRunning => memoryAccess is not null && memoryAccess.ProcessRunning;
+        public uint ProcessExitCode => (memoryAccess is not null) ? memoryAccess.ProcessExitCode : 0U;
 
         // Pointer Address Variables
-        private int pointerAddressHP;
-        private int pointerAddressStats;
-        private int pointerAddressInventory;
-        private int pointerAddressEnemy;
+        private nint pointerAddressHP;
+        private nint pointerAddressStats;
+        private nint pointerAddressInventory;
+        private nint pointerAddressEnemy;
 
         // Pointer Classes
-        private IntPtr BaseAddress { get; set; }
+        private FreeLibrarySafeHandle BaseAddress { get; set; }
 
         private MultilevelPointer[] PointerEnemy { get; set; }
         private MultilevelPointer[] PointerHP { get; set; }
@@ -48,34 +49,40 @@ namespace SRTPluginProviderRE0
 
             SelectPointerAddresses();
 
-            int pid = GetProcessId(process).Value;
+            uint pid = GetProcessId(process).Value;
             memoryAccess = new ProcessMemoryHandler(pid);
             if (ProcessRunning)
             {
-                BaseAddress = NativeWrappers.GetProcessBaseAddress(pid, PInvoke.ListModules.LIST_MODULES_32BIT); // Bypass .NET's managed solution for getting this and attempt to get this info ourselves via PInvoke since some users are getting 299 PARTIAL COPY when they seemingly shouldn't.
-                //POINTERS
-                var position = 0;
-                PointerHP = new MultilevelPointer[2];
-                for (var i = 0; i < PointerHP.Length; i++)
+                BaseAddress = new FreeLibrarySafeHandle(process.MainModule.BaseAddress, false);
+                // Broken, might be missing something for 32-bit support. Access violation error upon execution of this line.
+                //BaseAddress = NativeWrappers.GetProcessBaseAddress(pid, PInvoke.ListModules.LIST_MODULES_32BIT); // Bypass .NET's managed solution for getting this and attempt to get this info ourselves via PInvoke since some users are getting 299 PARTIAL COPY when they seemingly shouldn't.
                 {
-                    position = (i * 0x4) + 0x11C;
-                    PointerHP[i] = new MultilevelPointer(memoryAccess, IntPtr.Add(BaseAddress, pointerAddressHP), position, 0x30);
+                    nint baseAddressNIntPtr = BaseAddress.DangerousGetHandle();
+
+                    //POINTERS
+                    var position = 0;
+                    PointerHP = new MultilevelPointer[2];
+                    for (var i = 0; i < PointerHP.Length; i++)
+                    {
+                        position = (i * 0x4) + 0x11C;
+                        PointerHP[i] = new MultilevelPointer(memoryAccess, (nint*)(baseAddressNIntPtr + pointerAddressHP), position, 0x30);
+                    }
+
+                    PointerEnemy = new MultilevelPointer[MAX_ENTITES];
+                    for (var i = 0; i < MAX_ENTITES; i++)
+                    {
+                        position = (i * 0x10) + 0x2C;
+                        PointerEnemy[i] = new MultilevelPointer(memoryAccess, (nint*)(baseAddressNIntPtr + pointerAddressEnemy), position);
+                    }
+
+                    PointerStats = new MultilevelPointer(memoryAccess, (nint*)(baseAddressNIntPtr + pointerAddressStats));
+
+                    PointerInventory = new MultilevelPointer(memoryAccess, (nint*)(baseAddressNIntPtr + pointerAddressInventory));
+
+                    gameMemoryValues._playerInventory = new GameInventoryEntry[MAX_ITEMS];
+                    gameMemoryValues._playerInventory2 = new GameInventoryEntry[MAX_ITEMS];
+                    gameMemoryValues._enemyHealth = new GameEnemy[MAX_ENTITES];
                 }
-
-                PointerEnemy = new MultilevelPointer[MAX_ENTITES];
-                for (var i = 0; i < MAX_ENTITES; i++)
-                {
-                    position = (i * 0x10) + 0x2C;
-                    PointerEnemy[i] = new MultilevelPointer(memoryAccess, IntPtr.Add(BaseAddress, pointerAddressEnemy), position);
-                }
-
-                PointerStats = new MultilevelPointer(memoryAccess, IntPtr.Add(BaseAddress, pointerAddressStats));
-
-                PointerInventory = new MultilevelPointer(memoryAccess, IntPtr.Add(BaseAddress, pointerAddressInventory));
-
-                gameMemoryValues._playerInventory = new GameInventoryEntry[MAX_ITEMS];
-                gameMemoryValues._playerInventory2 = new GameInventoryEntry[MAX_ITEMS];
-                gameMemoryValues._enemyHealth = new GameEnemy[MAX_ENTITES];
             }
         }
 
@@ -156,20 +163,17 @@ namespace SRTPluginProviderRE0
             return gameMemoryValues;
         }
 
-        private int? GetProcessId(Process process) => process?.Id;
+        private uint? GetProcessId(Process process) => (uint?)process?.Id;
 
-        #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
-
-
-        private unsafe bool SafeReadByteArray(IntPtr address, int size, out byte[] readBytes)
+        private unsafe bool SafeReadByteArray(nuint address, nuint size, out byte[] readBytes)
         {
             readBytes = new byte[size];
             fixed (byte* p = readBytes)
-            {
                 return memoryAccess.TryGetByteArrayAt(address, size, p);
-            }
         }
+
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
 
         protected virtual void Dispose(bool disposing)
         {
