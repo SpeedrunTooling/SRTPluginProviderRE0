@@ -20,6 +20,12 @@ namespace SRTPluginProviderRE0.Structs.GameStructs
         public bool IsWeapon => ItemDatabase.Weapons.Contains(ID);
         public bool IsItem => ItemDatabase.Items.Contains(ID);
         public bool IsThrowable => ItemDatabase.Throwable.Contains(ID);
+
+        public GameInventoryEntry()
+        {
+            id = 0;
+            quantity = 0;
+        }
     }
 
     public class ItemDatabase

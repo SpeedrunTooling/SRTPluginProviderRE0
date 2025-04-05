@@ -44,10 +44,11 @@ namespace SRTPluginProviderRE0
 
         internal unsafe void Initialize(Process process)
         {
-            if (process == null)
+            if (process is null)
                 return; // Do not continue if this is null.
 
-            SelectPointerAddresses();
+            if (!SelectPointerAddresses(GameHashes.DetectVersion(process.MainModule.FileName)))
+                return; // Unknown version.
 
             uint pid = GetProcessId(process).Value;
             memoryAccess = new ProcessMemoryHandler(pid);
@@ -86,12 +87,30 @@ namespace SRTPluginProviderRE0
             }
         }
 
-        private void SelectPointerAddresses()
+        private bool SelectPointerAddresses(GameVersion version)
         {
-            pointerAddressEnemy = 0x9CE0D0;
-            pointerAddressHP = 0xA2F414;
-            pointerAddressStats = 0x9CDE9C;
-            pointerAddressInventory = 0x9CDF44; // Player1 0x24 +0x4 - 0x4C Player2 0x64 +0x4 - 0x8C
+            switch (version)
+            {
+                case GameVersion.RE0WW_20250317_1:
+                    {
+                        pointerAddressEnemy = 0x9CC0D0;
+                        pointerAddressHP = 0xA2D434;
+                        pointerAddressStats = 0x9CBE9C;
+                        pointerAddressInventory = 0x9CBF44;
+                        return true;
+                    }
+                case GameVersion.RE0WW_20210702_1:
+                    {
+                        pointerAddressEnemy = 0x9CE0D0;
+                        pointerAddressHP = 0xA2F414;
+                        pointerAddressStats = 0x9CDE9C;
+                        pointerAddressInventory = 0x9CDF44; // Player1 0x24 +0x4 - 0x4C Player2 0x64 +0x4 - 0x8C
+                        return true;
+                    }
+            }
+
+            // If we made it this far... rest in pepperonis. We have failed to detect any of the correct versions we support and have no idea what pointer addresses to use. Bail out.
+            return false;
         }
 
         internal void UpdatePointers()

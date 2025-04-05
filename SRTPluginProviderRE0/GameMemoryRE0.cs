@@ -36,7 +36,18 @@ namespace SRTPluginProviderRE0
 
         public GameInventoryEntry CurrentPersonal { get => _currentPersonal; set => _currentPersonal = value; }
         internal GameInventoryEntry _currentPersonal;
-        public GameInventoryEntry CurrentWeapon => PlayerInventory[EquippedSlot];
+
+        public GameInventoryEntry CurrentWeapon
+        {
+            get
+            {
+                if (EquippedSlot != -1)
+                    return PlayerInventory[EquippedSlot];
+                else
+                    return _emptyInventory;
+            }
+        }
+        internal GameInventoryEntry _emptyInventory = new GameInventoryEntry();
 
         public GameInventoryEntry[] PlayerInventory2 { get => _playerInventory2; set => _playerInventory2 = value; }
         internal GameInventoryEntry[] _playerInventory2;
