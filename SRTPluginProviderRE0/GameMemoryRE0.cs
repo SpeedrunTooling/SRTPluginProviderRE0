@@ -19,11 +19,13 @@ namespace SRTPluginProviderRE0
         internal GamePlayer _player;
 
         public string PlayerName => string.Format("{0}: ", Player.PlayerCharacter.ToString());
+        public string PlayerCostume => $"{Player.PlayerCostume}";
 
         public GamePlayer Player2 { get => _player2; set => _player2 = value; }
         internal GamePlayer _player2;
 
         public string PlayerName2 => string.Format("{0}: ", Player2.PlayerCharacter.ToString());
+        public string PlayerCostume2 => $"{Player2.PlayerCostume}";
 
         public GameStats Stats { get => _stats; set => _stats = value; }
         internal GameStats _stats;
@@ -41,10 +43,10 @@ namespace SRTPluginProviderRE0
         {
             get
             {
-                if (EquippedSlot != -1)
-                    return PlayerInventory[EquippedSlot];
-                else
+                if (EquippedSlot < 0 || EquippedSlot >= PlayerInventory.Length)
                     return _emptyInventory;
+                else
+                    return PlayerInventory[EquippedSlot];
             }
         }
         internal GameInventoryEntry _emptyInventory = new GameInventoryEntry();
@@ -58,7 +60,16 @@ namespace SRTPluginProviderRE0
         public GameInventoryEntry CurrentPersonal2 { get => _currentPersonal2; set => _currentPersonal2 = value; }
         internal GameInventoryEntry _currentPersonal2;
 
-        public GameInventoryEntry CurrentWeapon2 => PlayerInventory2[EquippedSlot2];
+        public GameInventoryEntry CurrentWeapon2
+        {
+            get
+            {
+                if (EquippedSlot2 < 0 || EquippedSlot2 >= PlayerInventory2.Length)
+                    return _emptyInventory;
+                else
+                    return PlayerInventory2[EquippedSlot2];
+            }
+        }
 
         public GameEnemy[] EnemyHealth { get => _enemyHealth; set => _enemyHealth = value; }
         internal GameEnemy[] _enemyHealth;

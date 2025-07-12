@@ -1,10 +1,9 @@
 ﻿namespace SRTPluginProviderRE0
 {
-	public enum CharacterEnumeration : int // mChangePlayerID
+	public enum CharacterEnumeration : int
 	{
 		Player = 0,
-		Rebecca = 15,
-		Billy = 11,
-		Wesker = 1
+        Rebecca = 3,
+        Billy = 5,
 	}
 }
