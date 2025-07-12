@@ -6,10 +6,8 @@ namespace SRTPluginProviderRE0.Structs.GameStructs
 
     public struct GameEnemy
     {
-        [FieldOffset(0x1030)] private uint currentHP;
-        public uint CurrentHP => currentHP;
-        //public uint MaxHP => PlayerCharacter == CharacterEnumeration.Rebecca ? 150 : 250;
-        //public float Percentage => CurrentHP > 0 ? (float)CurrentHP / (float)MaxHP: 0f;
-        public bool IsAlive => CurrentHP != 0xFFFFFFFF && CurrentHP > 0;
+        [FieldOffset(0x1030)] private int currentHP;
+        public int CurrentHP => currentHP;
+        public bool IsAlive => CurrentHP > 0;
     }
 }
