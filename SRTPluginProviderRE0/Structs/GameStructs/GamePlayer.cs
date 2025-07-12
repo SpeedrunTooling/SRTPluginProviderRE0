@@ -6,10 +6,30 @@ namespace SRTPluginProviderRE0.Structs.GameStructs
 
     public struct GamePlayer
     {
-        [FieldOffset(0xFC)] private int id;
+        [FieldOffset(0xFC)] private int costume;
+        [FieldOffset(0x100)] private int character;
         [FieldOffset(0x1030)] private int currentHP;
 
-        public CharacterEnumeration PlayerCharacter => (CharacterEnumeration)id;
+        public string PlayerCostume
+        {
+            get
+            {
+                switch (PlayerCharacter)
+                {
+                    case CharacterEnumeration.Rebecca:
+                        return $"{(RebeccaCostumeEnumeration)costume}";
+                    case CharacterEnumeration.Billy:
+                        return $"{(BillyCostumeEnumeration)costume}";
+                    //case CharacterEnumeration.Wesker:
+                    //    return $"{(WeskerCostumeEnumeration)costume}";
+                    default:
+                        return $"{costume}";
+                }
+            }
+        }
+
+        public CharacterEnumeration PlayerCharacter => (CharacterEnumeration)character;
+
         public int CurrentHP => currentHP;
         public int MaxHP => PlayerCharacter == CharacterEnumeration.Rebecca ? 150 : 250;
         public float Percentage => CurrentHP > 0 ? (float)CurrentHP / (float)MaxHP : 0f;
